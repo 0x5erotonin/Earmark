@@ -1,35 +1,34 @@
-# Earmark on Fly.io.
-# Rename `app` before first deploy (must be globally unique), or let
-# `fly launch --copy-config` prompt you. IaC users: the Terraform package
-# creates the app/volume/machine instead — see ../earmark-iac.
+# fly.toml app configuration file generated for earmark-hp-cdw on 2026-07-03T19:45:34Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "earmark"
-primary_region = "iad"   # you appear US-east; change to "ams" only if you prefer EU
+app = 'earmark-hp-cdw'
+primary_region = 'ams'
 
 [build]
-  # image built from ./Dockerfile
 
 [env]
-  DATA_DIR = "/data"
+  DATA_DIR = '/data'
 
-[mounts]
-  source = "earmark_data"        # created via `fly volumes create` or Terraform
-  destination = "/data"
+[[mounts]]
+  source = 'earmark_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = "stop"    # scale to zero when idle
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
 
   [[http_service.checks]]
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "10s"
-    method = "GET"
-    path = "/healthz"
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/healthz'
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "512mb"
+  size = 'shared-cpu-1x'
+  memory = '512mb'
