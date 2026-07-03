@@ -1,0 +1,6 @@
+tests/
+__pycache__/
+*.pyc
+.git/
+docker-compose.yml
+README.md

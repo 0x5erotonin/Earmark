@@ -1,0 +1,1613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earmark — hear what matters</title>
+<style>
+/* ============================================================
+   EARMARK — "Control Room"
+   Cold porcelain workspace · void-dark instrument panels ·
+   electric cobalt · solid signal cells · mono data everywhere
+   ============================================================ */
+:root{
+  /* ---------- AURA (default / boutique light) ---------- */
+  /* dark instrument surfaces (console, toasts, chips.on) — warm mocha */
+  --void:#2C231B;   --void2:#3A2E24;  --edge:#4E3E30;  --edge2:#352A20;
+  /* sidebar (light in Aura) */
+  --rail-bg:#FAF6F0; --rail-line:#EDE4D8; --rail-active:#EFE5D7;
+  --rail-ink:#32281F; --rail-mut:#9C8D7B;
+  --nav-bar:transparent; --nav-ring:var(--line);
+  /* workspace */
+  --bg:#F4EEE6;     --panel:#FFFFFF;  --line:#E9DFD2;  --line2:#F2ECE2;
+  --ink:#2C231B;    --mut:#8F8171;
+  /* accent — warm bronze (links, ticks, charts) */
+  --blue:#8C674A;   --blue-deep:#6E4F37; --blue-soft:#F3EADD;
+  --accent-ink:#6E4F37;
+  /* primary CTA — deep mocha */
+  --cta-bg:#463830; --cta-ink:#FFF8EF; --cta-hover:#362A23;
+  /* console glow — soft gold */
+  --cyan:#E3B878;
+  /* bands — softened but semantic */
+  --high:#C05A45;   --high-ink:#fff;    --high-soft:#F8E7E1;
+  --med:#D9A441;    --med-ink:#4A3910;  --med-deep:#8A6410; --med-soft:#F7EDD8;
+  --low:#A79B8B;    --low-ink:#8F8171;  --low-soft:#F1EAE0;
+  --ok:#6F8F63;     --ok-soft:#EAF0E4;
+  --sc-hi-bg:var(--high); --sc-hi-ink:#fff;
+  --sc-md-bg:var(--med);  --sc-md-ink:#4A3910;
+  --sc-lo-bg:transparent; --sc-lo-ink:var(--mut); --sc-lo-bd:inset 0 0 0 1px var(--low);
+  --now-bg:var(--void); --now-ink:var(--cyan);
+  /* geometry & depth — pillowy */
+  --r:18px; --r-sm:12px; --pill-r:999px; --tick-r:999px; --avatar-r:999px;
+  --shadow:0 14px 34px -20px rgba(62,46,30,.28),0 2px 6px rgba(62,46,30,.05);
+  /* type — serif display for the boutique voice */
+  --disp:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --disp-weight:700; --disp-track:-.005em; --disp-case:none;
+  --kick-case:uppercase;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Roboto,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code","IBM Plex Mono",Menlo,Consolas,monospace;
+}
+/* ============ BLOOMBERG NOIR (optional / dark) ============ */
+[data-theme="noir"]{
+  --void:#0A0D11;   --void2:#141920;  --edge:#232B34;  --edge2:#161C24;
+  --rail-bg:#0A0D11; --rail-line:#161C24; --rail-active:#141920;
+  --rail-ink:#C3D0DC; --rail-mut:#61707E;
+  --nav-bar:#FFB020; --nav-ring:transparent;
+  --cta-bg:#FFB020; --cta-ink:#241B07; --cta-hover:#FFC44D;
+  --avatar-r:5px;
+  --shadow:none;
+  --bg:#0B0E12;     --panel:#12161C;  --line:#1F262F;  --line2:#171D25;
+  --ink:#E4EAF0;    --mut:#6E7C8A;
+  --blue:#FFB020;   --blue-deep:#FFC44D; --blue-soft:#241B07;
+  --accent-ink:#FFB020;
+  --cyan:#FFB020;
+  --high:#FF4D4D;   --high-ink:#fff;    --high-soft:#2A1414;
+  --med:#FFB020;    --med-ink:#241B07;  --med-deep:#FFB020; --med-soft:#241B07;
+  --low:#3A434E;    --low-ink:#6E7C8A;  --low-soft:#171D25;
+  --ok:#22C55E;     --ok-soft:#0C2116;
+  --sc-hi-bg:var(--high); --sc-hi-ink:#fff;
+  --sc-md-bg:var(--med);  --sc-md-ink:#241B07;
+  --sc-lo-bg:transparent; --sc-lo-ink:var(--mut); --sc-lo-bd:inset 0 0 0 1px #2C3540;
+  --now-bg:#000; --now-ink:var(--cyan);
+  --r:5px; --r-sm:4px; --pill-r:4px; --tick-r:0;
+  --disp:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Roboto,Arial,sans-serif;
+  --disp-weight:700; --disp-track:.01em; --disp-case:none;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14.5px/1.55 var(--sans);-webkit-font-smoothing:antialiased;
+  transition:background .2s,color .2s}
+a{color:var(--blue-deep)}
+button{font:inherit;cursor:pointer}
+::selection{background:var(--blue-soft)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:3px}
+
+/* ---------- wordmark: condensed caps + cobalt cursor block ---------- */
+.wordmark{font-family:var(--disp);font-weight:var(--disp-weight);
+  letter-spacing:var(--disp-track);text-transform:var(--disp-case);
+  text-decoration:none;color:inherit;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:.3em}
+.wordmark::after{content:"";width:.34em;height:.34em;background:var(--cyan);
+  display:inline-block;translate:0 .06em;border-radius:var(--tick-r)}
+.wordmark em{font-style:normal}
+
+/* ============================ sign-in ============================ */
+#signin{min-height:100vh;display:grid;grid-template-columns:1.15fr 1fr}
+@media(max-width:860px){#signin{grid-template-columns:1fr}}
+.hero{background:var(--void);color:var(--rail-ink);display:flex;flex-direction:column;
+  justify-content:center;padding:4rem 4.5rem;position:relative;overflow:hidden}
+.hero .wordmark{font-size:3rem;color:#fff}
+.hero .wordmark::after{animation:blink 1.6s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero .tag{font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:.18em;font-size:.8rem;color:var(--rail-mut);margin:1rem 0 2.4rem}
+.hero .wave{width:100%;max-width:520px;height:72px}
+.hero .meta{margin-top:2.6rem;font-family:var(--mono);font-size:.72rem;
+  color:var(--rail-mut);letter-spacing:.06em;line-height:2}
+.hero .meta b{color:var(--cyan);font-weight:500}
+.gate{display:flex;align-items:center;justify-content:center;padding:2.5rem;
+  background:var(--bg)}
+.gate .card{width:min(380px,100%)}
+.gate h2{font-family:var(--disp);text-transform:uppercase;
+  letter-spacing:.1em;font-size:1.05rem;margin:0 0 1.4rem}
+.gate label{display:block;font-family:var(--mono);font-size:.68rem;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--mut);
+  margin:1rem 0 .35rem}
+.gate input{width:100%;border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:.65rem .75rem;font:inherit;background:var(--panel);color:var(--ink)}
+.gate .fine{font-size:.78rem;color:var(--mut);margin-top:1.2rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+  border:1px solid var(--cta-bg);background:var(--cta-bg);color:var(--cta-ink);
+  border-radius:var(--pill-r);padding:.55rem 1.15rem;font-weight:600;
+  font-size:.88rem;letter-spacing:.01em}
+.btn:hover{background:var(--cta-hover);border-color:var(--cta-hover)}
+.btn.quiet{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn.quiet:hover{border-color:var(--mut)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--blue-deep)}
+.btn.danger{background:#fff;color:var(--high);border-color:var(--high)}
+.btn.danger:hover{background:var(--high-soft)}
+.btn.wide{width:100%;margin-top:1rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ============================ app frame ============================ */
+#app{display:none;min-height:100vh}
+#app.on{display:grid;grid-template-columns:208px 1fr}
+aside.rail{background:var(--rail-bg);color:var(--rail-ink);padding:1.15rem .9rem;
+  display:flex;flex-direction:column;gap:.15rem;position:sticky;top:0;
+  height:100vh;border-right:1px solid var(--rail-line)}
+aside.rail .wordmark{font-size:1.35rem;color:var(--rail-ink);margin:.1rem .5rem 0}
+.navbtn{display:flex;align-items:center;gap:.65rem;width:100%;text-align:left;
+  background:none;border:0;color:var(--rail-mut);padding:.58rem .7rem;
+  border-radius:var(--r-sm);font-family:var(--sans);font-size:.9rem;
+  font-weight:550;letter-spacing:0}
+.navbtn svg{flex:none;opacity:.8}
+.navbtn:hover{background:var(--rail-active);color:var(--rail-ink)}
+.navbtn.on{background:var(--rail-active);color:var(--rail-ink);font-weight:650;
+  box-shadow:inset 3px 0 0 var(--nav-bar),inset 0 0 0 1px var(--nav-ring)}
+.navbtn .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;
+  background:var(--med);color:var(--med-ink);border-radius:99px;
+  padding:.14em .55em;font-weight:700;letter-spacing:0}
+aside.rail .foot{margin-top:auto;border-top:1px solid var(--rail-line);
+  padding-top:.85rem;display:flex;align-items:center;gap:.6rem;
+  font-size:.82rem;color:var(--rail-ink)}
+.avatar{width:30px;height:30px;border-radius:var(--avatar-r);background:var(--cta-bg);
+  color:var(--cta-ink);display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.72rem;font-family:var(--mono);flex:none}
+aside.rail .foot .role{color:var(--rail-mut);font-size:.68rem;display:block;
+  font-family:var(--mono);letter-spacing:.04em}
+.railbtn{background:none;border:0;color:var(--rail-mut);padding:.3rem;
+  border-radius:4px;margin-left:auto}
+.railbtn:hover{color:var(--rail-ink);background:var(--rail-active)}
+
+.maincol{display:flex;flex-direction:column;min-width:0}
+header.topbar{display:flex;align-items:center;gap:1rem;
+  padding:.85rem 1.6rem .6rem;background:var(--bg);border-bottom:0;
+  position:sticky;top:0;z-index:20}
+header.topbar .ws{font-family:var(--disp);font-weight:650;font-size:.98rem;
+  letter-spacing:-.01em}
+header.topbar .ws small{display:block;font-family:var(--mono);font-weight:400;
+  color:var(--mut);font-size:.64rem;letter-spacing:.12em;
+  text-transform:uppercase}
+.jobpill{display:none;align-items:center;gap:.55rem;font-size:.76rem;
+  font-family:var(--mono);background:var(--void);color:var(--cyan);
+  border-radius:4px;padding:.32rem .8rem;letter-spacing:.03em}
+.jobpill.on{display:inline-flex}
+.reel{width:13px;height:13px;flex:none;animation:spin 1.1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+header.topbar .grow{flex:1}
+.search{position:relative}
+.search input{border:1px solid var(--line);border-radius:var(--pill-r);
+  background:var(--panel);box-shadow:var(--shadow);
+  padding:.5rem 1rem .5rem 2.1rem;font:inherit;
+  font-size:.86rem;width:260px;color:var(--ink)}
+.search input:focus{background:#fff}
+.search svg{position:absolute;left:.65rem;top:50%;translate:0 -50%;opacity:.45}
+
+main#view{padding:1.6rem 1.7rem 4rem;max-width:1220px;width:100%;margin:0 auto}
+h1.page{font-family:var(--disp);font-weight:var(--disp-weight);
+  font-size:1.62rem;text-transform:var(--disp-case);
+  letter-spacing:var(--disp-track);margin:.1rem 0 .3rem}
+p.lede{color:var(--mut);margin:0 0 1.35rem;max-width:64ch;font-size:.92rem}
+h2{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--mut);
+  margin:1.8rem 0 .6rem;display:flex;align-items:center;gap:.5em}
+h2::before{content:"";width:8px;height:8px;background:var(--blue);flex:none;
+  border-radius:var(--tick-r)}
+.panel{background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:var(--shadow);
+  transition:background .2s,border-color .2s}
+.pad{padding:1.05rem 1.15rem}
+
+/* ---------- signal cell: solid score blocks ---------- */
+.score{display:inline-flex;align-items:baseline;gap:.4em;
+  font-family:var(--mono);font-weight:700;font-size:.98rem;
+  padding:.16em .5em;border-radius:var(--r-sm)}
+.score small{font-weight:600;font-size:.56rem;letter-spacing:.12em;
+  text-transform:uppercase;opacity:.85}
+.score.high{background:var(--sc-hi-bg);color:var(--sc-hi-ink)}
+.score.medium{background:var(--sc-md-bg);color:var(--sc-md-ink)}
+.score.low{background:var(--sc-lo-bg);color:var(--sc-lo-ink);
+  box-shadow:var(--sc-lo-bd)}
+
+.tag{display:inline-block;font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.04em;padding:.18em .55em;border-radius:3px;
+  background:var(--blue-soft);color:var(--blue-deep);font-weight:600;
+  white-space:nowrap}
+.pill{display:inline-block;font-family:var(--mono);font-size:.64rem;
+  letter-spacing:.08em;text-transform:uppercase;padding:.16em .55em;
+  border-radius:3px;border:1px solid var(--line);color:var(--mut);
+  background:#fff}
+.pill.new{color:var(--blue-deep);border-color:#B9C4F8;background:var(--blue-soft)}
+.pill.confirmed{color:var(--ok);border-color:#93D9BF;background:var(--ok-soft)}
+.pill.dismissed{color:var(--mut);background:var(--low-soft)}
+.pill.escalated{color:var(--high);border-color:#F0A9AD;background:var(--high-soft)}
+
+/* ---------- queue ---------- */
+.filters{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;
+  margin:0 0 1rem}
+.chip{border:1px solid var(--line);background:var(--panel);
+  border-radius:var(--pill-r);padding:.34rem .85rem;font-family:var(--sans);
+  font-size:.8rem;letter-spacing:0;color:var(--ink)}
+.chip:hover{border-color:var(--blue)}
+.chip.on{background:var(--void);border-color:var(--void);color:var(--rail-ink)}
+.chip .dot{display:inline-block;width:8px;height:8px;border-radius:99px;
+  margin-right:.45em;vertical-align:0}
+.chip .dot.high{background:var(--high)}.chip .dot.medium{background:var(--med)}
+.chip .dot.low{background:var(--low)}
+table.q{border-collapse:collapse;width:100%;font-size:.9rem}
+table.q th{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--mut);text-align:left;padding:.6rem .8rem;
+  border-bottom:1px solid var(--line);white-space:nowrap;font-weight:600}
+table.q td{padding:.62rem .8rem;border-bottom:1px solid var(--line2);
+  vertical-align:middle}
+table.q tr:last-child td{border-bottom:0}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--blue-soft)}
+td.snip{color:var(--mut)}
+td.snip mark{background:transparent;border-radius:0;padding:0 .05em;
+  color:var(--ink);font-weight:500;
+  box-shadow:inset 0 -6px 0 rgba(39,67,240,.14),inset 0 -1px 0 var(--blue)}
+.mono{font-family:var(--mono);font-size:.85em}
+.muted{color:var(--mut)}
+.empty{padding:2.4rem;text-align:center;color:var(--mut)}
+.empty .big{font-family:var(--disp);text-transform:uppercase;
+  letter-spacing:.08em;font-size:1.05rem;color:var(--ink);margin-bottom:.3rem}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--ink)}
+th.sortable .arr{font-size:.95em;color:var(--blue)}
+td.ck,th.ck{width:2rem;text-align:center;padding-right:0}
+input[type=checkbox].box{width:15px;height:15px;accent-color:var(--blue);
+  cursor:pointer}
+.bulkbar{display:flex;gap:.6rem;align-items:center;background:var(--void);
+  color:#E8ECF4;border-radius:var(--r);padding:.5rem .9rem;
+  margin-bottom:.8rem;font-size:.85rem;font-family:var(--mono)}
+.bulkbar b{color:var(--cyan)}
+.bulkbar .btn{padding:.28rem .75rem;font-size:.78rem}
+
+/* ---------- waveform strips ---------- */
+.wave rect{fill:#CBD3DF}
+.wave rect.hit-high{fill:var(--high)}
+.wave rect.hit-medium{fill:var(--med)}
+.wave rect.hit-low{fill:var(--low)}
+.wave rect.played{fill:#9AA6B8}
+
+/* ---------- call workspace: dark console ---------- */
+.callgrid{display:grid;grid-template-columns:395px 1fr;gap:1.1rem;
+  align-items:start}
+@media(max-width:980px){.callgrid{grid-template-columns:1fr}
+  #app.on{grid-template-columns:60px 1fr}
+  aside.rail .wordmark{font-size:.85rem}
+  aside.rail .wordmark::after{display:none}
+  .navbtn span.lbl,.navbtn .count,aside.rail .foot div{display:none}}
+.player{position:sticky;top:64px}
+.console{background:var(--void);border-color:var(--edge2);color:#C6D0E2}
+.console .muted{color:#5D6A82}
+.console .kbd{background:var(--void2);border-color:var(--edge);
+  border-bottom-color:var(--edge);color:#8FA0BD}
+.bigwave{width:100%;height:96px;display:block;cursor:pointer;
+  touch-action:none}
+.bigwave rect{fill:#26304A}
+.bigwave rect.hit-high{fill:var(--high)}
+.bigwave rect.hit-medium{fill:var(--med)}
+.bigwave rect.hit-low{fill:#5D6A82}
+.bigwave rect.played{fill:#41507A}
+.pctl{display:flex;align-items:center;gap:.7rem;margin-top:.75rem;
+  flex-wrap:wrap}
+.playbtn{width:42px;height:42px;border-radius:4px;border:1px solid var(--edge);
+  background:var(--void2);color:var(--cyan);display:flex;
+  align-items:center;justify-content:center;flex:none}
+.playbtn:hover{border-color:var(--cyan)}
+.tc{font-family:var(--mono);font-size:.88rem;min-width:8.5ch;color:var(--cyan)}
+.speed{border:1px solid var(--line);border-radius:4px;padding:.3rem .4rem;
+  font:inherit;font-family:var(--mono);font-size:.78rem;background:#fff;
+  color:var(--ink)}
+.console .speed{background:var(--void2);border-color:var(--edge);
+  color:#C6D0E2}
+.console label{color:#8FA0BD}
+.kbd{display:inline-block;font-family:var(--mono);font-size:.68rem;
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
+  padding:0 .4em;background:#fff;color:var(--mut)}
+
+.flagcard{border:1px solid var(--line);border-left:4px solid var(--line);
+  border-radius:var(--r);background:#fff;padding:.85rem .95rem;
+  margin-bottom:.75rem}
+.flagcard.high{border-left-color:var(--high)}
+.flagcard.medium{border-left-color:var(--med)}
+.flagcard.low{border-left-color:var(--low)}
+.flagcard.active{box-shadow:0 0 0 2px var(--blue)}
+.flagcard .why{font-size:.86rem;color:var(--mut);margin:.45rem 0 .55rem}
+.flagcard .row2{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.flagcard input[type=text]{flex:1;min-width:9rem;border:1px solid var(--line);
+  border-radius:4px;padding:.4rem .55rem;font:inherit;font-size:.86rem}
+.flagcard .decided{font-family:var(--mono);font-size:.72rem;color:var(--mut);
+  margin-top:.5rem}
+.sbtn{border:1px solid var(--line);background:#fff;border-radius:4px;
+  padding:.36rem .7rem;font-size:.82rem;font-weight:600}
+.sbtn.confirm{color:var(--ok);border-color:#93D9BF}
+.sbtn.confirm:hover{background:var(--ok-soft)}
+.sbtn.dismiss:hover{background:var(--low-soft)}
+.sbtn.escalate{color:var(--high);border-color:#F0A9AD}
+.sbtn.escalate:hover{background:var(--high-soft)}
+
+/* ---------- transcript: DAW-region highlights ---------- */
+.script{max-height:70vh;overflow-y:auto;padding:1.05rem 1.2rem;
+  font-size:1rem;line-height:2.05}
+.utt{margin:0 0 .85rem}
+.utt .spk{display:block;font-family:var(--mono);font-size:.62rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--mut);
+  margin-bottom:.05rem}
+.utt.agent .spk{color:var(--blue-deep)}
+.w{cursor:pointer;border-radius:2px;padding:0 1px}
+.w:hover{background:var(--blue-soft)}
+.w.now{background:var(--now-bg);color:var(--now-ink)}
+.w.hit{background:var(--rg,var(--blue-soft));
+  box-shadow:inset 0 -2px 0 var(--mk,var(--blue))}
+.w.hit.b-high{--mk:var(--high);--rg:rgba(222,47,56,.10)}
+.w.hit.b-medium{--mk:var(--med);--rg:rgba(231,166,0,.14)}
+.w.hit.b-low{--mk:var(--low);--rg:rgba(139,150,168,.14)}
+
+/* ---------- phrases ---------- */
+.concept-group{margin-bottom:1.2rem}
+.concept-group>h3{font-family:var(--mono);font-size:.66rem;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--mut);
+  margin:0 0 .45rem;display:flex;align-items:center;gap:.5em}
+.concept-group>h3::before{content:"";width:6px;height:6px;
+  background:var(--blue)}
+.phr{display:flex;gap:.9rem;align-items:flex-start;padding:.8rem 1rem;
+  border-bottom:1px solid var(--line2)}
+.phr:last-child{border-bottom:0}
+.phr .t{font-weight:600}
+.phr .alts{font-size:.82rem;color:var(--mut)}
+.phr .meta{margin-left:auto;text-align:right;flex:none}
+.phr .meta .n{font-family:var(--mono);font-weight:700;font-size:1.05rem}
+.phr .meta small{display:block;color:var(--mut);font-family:var(--mono);
+  font-size:.6rem;text-transform:uppercase;letter-spacing:.1em}
+.phr .edit{margin-left:.6rem}
+.switch{position:relative;width:36px;height:20px;flex:none;margin-top:2px}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.switch i{position:absolute;inset:0;background:#C2CBD9;border-radius:3px;
+  transition:.15s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:14px;
+  height:14px;border-radius:2px;background:#fff;transition:.15s}
+.switch input:checked+i{background:var(--ok)}
+.switch input:checked+i::after{left:19px}
+.testchip{display:inline-block;font-size:.7rem;font-family:var(--mono);
+  border-radius:3px;padding:.12em .5em;margin:.15em .2em .15em 0}
+.testchip.pass{background:var(--ok-soft);color:var(--ok)}
+.testchip.fail{background:var(--high-soft);color:var(--high)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.formgrid label,.stack label,.fieldcol{display:flex;flex-direction:column;
+  gap:.28rem;font-family:var(--mono);font-size:.64rem;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--mut)}
+.formgrid input,.formgrid textarea,.stack input,.stack select{
+  border:1px solid var(--line);border-radius:4px;padding:.5rem .6rem;
+  font:inherit;font-family:var(--sans);font-size:.92rem;background:#fff;
+  color:var(--ink);text-transform:none;letter-spacing:0}
+.formgrid .full{grid-column:1/-1}
+@media(max-width:760px){.formgrid{grid-template-columns:1fr}}
+
+/* ---------- analytics ---------- */
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));
+  gap:.9rem;margin-bottom:1rem}
+.stat{padding:1rem 1.15rem}
+.stat .n{font-family:var(--disp);font-size:2.1rem;font-weight:700;
+  line-height:1.15}
+.stat small{color:var(--mut);font-family:var(--mono);font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.12em}
+.chart2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+@media(max-width:860px){.chart2{grid-template-columns:1fr}}
+.hbar{display:flex;align-items:center;gap:.7rem;margin:.4rem 0;
+  font-size:.82rem}
+.hbar .lab{width:11.5em;flex:none;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;font-family:var(--mono);font-size:.76rem}
+.hbar .trk{flex:1;height:12px;background:var(--line2);border-radius:2px;
+  overflow:hidden}
+.hbar .trk i{display:block;height:100%;background:var(--blue);
+  border-radius:2px}
+.hbar .val{font-family:var(--mono);min-width:3ch;text-align:right}
+.prec td,.prec th{padding:.45rem .6rem;font-size:.88rem}
+.prec th{text-align:left;font-family:var(--mono);font-size:.62rem;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--mut)}
+.prec td{border-bottom:1px solid var(--line2)}
+
+/* ---------- admin ---------- */
+.drop{border:1px dashed var(--mut);border-radius:var(--r);padding:1.5rem;
+  text-align:center;color:var(--mut);background:var(--bg);transition:.15s}
+.drop.over{border-color:var(--blue);background:var(--blue-soft);
+  border-style:solid}
+.steps{counter-reset:s}
+.stepcard{display:flex;gap:1rem;margin-bottom:1rem}
+.stepcard::before{counter-increment:s;content:"0" counter(s);flex:none;
+  width:2.2rem;height:2.2rem;background:var(--void);color:var(--cyan);
+  display:flex;align-items:center;justify-content:center;font-weight:700;
+  font-family:var(--mono);font-size:.8rem;border-radius:4px}
+.stepcard>div{flex:1;min-width:0}
+.stepcard h2{margin-top:.3rem}
+.range{display:flex;align-items:center;gap:.8rem}
+.range input[type=range]{flex:1;accent-color:var(--blue)}
+.range output{font-family:var(--mono);font-weight:700;min-width:3.2ch}
+.audit td{font-size:.8rem;padding:.45rem .7rem;
+  border-bottom:1px solid var(--line2);vertical-align:top}
+.audit td.mono,.audit td:nth-child(3){font-family:var(--mono);font-size:.74rem}
+.audit th{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--mut);text-align:left;padding:.5rem .7rem;
+  border-bottom:1px solid var(--line)}
+.pendbox{display:flex;align-items:center;gap:.6rem;margin-top:.7rem;
+  font-size:.84rem;background:var(--blue-soft);
+  border:1px solid #B9C4F8;border-radius:4px;padding:.45rem .8rem}
+.pendbox .mono{font-size:.78rem}
+.inviterow{display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap;
+  padding:.8rem 1rem;border-top:1px solid var(--line2)}
+
+/* ---------- toast ---------- */
+#toasts{position:fixed;bottom:1.2rem;left:50%;translate:-50% 0;z-index:99;
+  display:flex;flex-direction:column;gap:.5rem;align-items:center}
+.toast{background:var(--void);color:#E8ECF4;border:1px solid var(--edge);
+  border-radius:4px;padding:.55rem 1.1rem;font-size:.85rem;
+  font-family:var(--mono);animation:pop .18s ease-out}
+.toast b{color:var(--cyan)}
+@keyframes pop{from{opacity:0;translate:0 8px}}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important;
+    scroll-behavior:auto!important}}
+.themebtn{display:inline-flex;align-items:center;gap:.45rem;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:var(--pill-r);padding:.4rem .8rem;font-size:.82rem;
+  font-weight:550}
+.themebtn:hover{border-color:var(--mut)}
+.themebtn svg{opacity:.75}
+.tier{font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--rail-mut);margin:.1rem .5rem 1rem;
+  display:block}
+.ctanew{width:100%;margin-bottom:1rem;justify-content:center}
+.bellbtn{position:relative;display:inline-flex;align-items:center;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:var(--pill-r);padding:.5rem .6rem;box-shadow:var(--shadow)}
+.bellbtn:hover{border-color:var(--mut)}
+.bbadge{position:absolute;top:-6px;right:-6px;font-family:var(--mono);
+  font-size:.6rem;font-weight:700;background:var(--med);color:var(--med-ink);
+  border-radius:99px;padding:.1em .45em}
+.hello h1.page{font-size:1.9rem;margin-bottom:.15rem}
+.hello .lede{margin-bottom:1.4rem}
+.hello b{color:var(--blue-deep)}
+.ovr{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+  gap:1rem;margin-bottom:1.6rem}
+.ov{display:flex;flex-direction:column;gap:.35rem;align-items:flex-start}
+.ov .kick2{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--mut)}
+.ov .big{font-family:var(--disp);font-weight:700;font-size:2.7rem;
+  line-height:1.05}
+.ov .big small{font-size:1.4rem;color:var(--mut)}
+.ov .sub{font-size:.82rem;color:var(--mut);line-height:1.4}
+.ov .btn{margin-top:.55rem}
+.ov.attn .aicon{width:38px;height:38px;border-radius:99px;
+  background:var(--high-soft);color:var(--high);display:flex;
+  align-items:center;justify-content:center;font-weight:800;
+  margin-bottom:.15rem}
+[data-theme="noir"] header.topbar{border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<!-- ============================ SIGN-IN ============================ -->
+<div id="signin">
+  <div class="hero">
+    <span class="wordmark">EARMARK</span>
+    <p class="tag">Call review &amp; flag intelligence</p>
+    <svg class="wave" id="gatewave" viewBox="0 0 520 72" aria-hidden="true"></svg>
+    <p class="meta">EVERY CALL TRANSCRIBED · EVERY MATCH SCORED <b>0–100</b><br>
+      EVERY DECISION <b>AUDIT-LOGGED</b> · SOC 2 · SSO / SAML</p>
+  </div>
+  <div class="gate">
+    <div class="card">
+      <h2>Sign in to your workspace</h2>
+      <label for="si-email">Work email</label>
+      <input id="si-email" type="email" placeholder="you@company.com" autocomplete="email">
+      <button class="btn wide" onclick="enter()">Continue with SSO</button>
+      <button class="btn quiet wide" onclick="enter()">Continue as guest</button>
+      <p class="fine">Single sign-on keeps reviewer identity verified —
+        every action in Earmark is attributed and logged.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ APP ============================ -->
+<div id="app">
+  <aside class="rail">
+    <a class="wordmark" href="#" onclick="go('queue');return false">Earmark</a>
+    <span class="tier">Compliance Suite</span>
+    <button class="btn ctanew" onclick="go('admin')">＋ New scan</button>
+    <button class="navbtn" data-v="queue" onclick="go('queue')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span class="lbl">Queue</span><span class="count" id="qcount">0</span></button>
+    <button class="navbtn" data-v="calls" onclick="go('calls')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 14v-4m4 7V7m4 12V5m4 12V9m4 3v0"/></svg>
+      <span class="lbl">Calls</span></button>
+    <button class="navbtn" data-v="phrases" onclick="go('phrases')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v13l-7-4-7 4z"/></svg>
+      <span class="lbl">Phrases</span></button>
+    <button class="navbtn" data-v="analytics" onclick="go('analytics')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19L9 12l4 3 7-9"/></svg>
+      <span class="lbl">Analytics</span></button>
+    <button class="navbtn" data-v="admin" onclick="go('admin')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <span class="lbl">Admin</span></button>
+    <div class="foot">
+      <span class="avatar" id="u-init">DR</span>
+      <div><span id="u-name">Guest</span><span class="role">Reviewing manager</span></div>
+      <button class="railbtn" onclick="signOut()" aria-label="Sign out" title="Sign out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="maincol">
+    <header class="topbar">
+      <div class="ws">Workspace<small>Compliance review</small></div>
+      <span class="jobpill" id="jobpill">
+        <svg class="reel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3v4m6.4 9.7-3.5-2M5.6 16.7l3.5-2"/></svg>
+        <span id="jobmsg">Working…</span></span>
+      <div class="grow"></div>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Search flags &amp; snippets"
+               oninput="S.search=this.value;S.view==='queue'?render():go('queue')">
+      </div>
+      <button class="bellbtn" onclick="S.status='new';go('queue')"
+        aria-label="Flags awaiting review" title="Flags awaiting review">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="bbadge" id="bellcount" hidden>0</span></button>
+      <button class="themebtn" id="themebtn" onclick="toggleTheme()"
+        aria-label="Switch theme" title="Switch theme">
+        <svg id="themeicon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        <span id="themelbl">Nordic</span></button>
+    </header>
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ================================================================
+   EARMARK demo workspace — QA buildout: every control functional.
+   All state lives in memory.
+   ================================================================ */
+
+/* ---------- tiny seeded rng for stable waveforms ---------- */
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;
+  let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+  return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- calls: speaker turns → timed words ---------- */
+/* ---------- synthetic templates: uploads become one of these on scan ------ */
+const SYNTH=[
+ {agent:"Marcus L.",utts:[
+  ["agent","claims desk this is Marcus how can I help"],
+  ["caller","hi my card was declined and honestly could you share the security code so I can log in and check"],
+  ["agent","I can't share codes but I can send a secure reset link to your email on file"],
+  ["caller","fine send the link I suppose that works thanks for the quick answer"]],
+  flags:[[3,"share the security code so I can log in",.90],
+         [3,"send a secure reset link",.42]]},
+ {agent:"Lee K.",utts:[
+  ["agent","accounts team this is Lee speaking"],
+  ["caller","hello I want to double check that my direct deposit went through this month"],
+  ["agent","it posted on the first as scheduled is there anything else"],
+  ["caller","perfect no that was all I needed have a good afternoon"]],
+  flags:[]},
+ {agent:"Dana W.",utts:[
+  ["agent","billing support this is Dana"],
+  ["caller","hey our vendor says the invoice is overdue and it is urgent you need to do it right now"],
+  ["agent","I can see the invoice let me check the payment status for you"],
+  ["caller","they said if it is not wired today they pause the contract so please hurry"],
+  ["agent","I understand the pressure let me confirm the details through the normal process"]],
+  flags:[[5,"it is urgent you need to do it right now",.93],
+         [5,"so please hurry",.44]]}];
+
+const WPS=.34, GAP=.55;
+function buildCall(raw,id){
+  const words=[]; let t=.8;
+  raw.utts.forEach(([spk,txt],ui)=>{
+    txt.split(" ").forEach(tok=>{
+      words.push({w:tok,s:+t.toFixed(2),e:+(t+WPS).toFixed(2),spk,ui});
+      t+=WPS+.02});
+    t+=GAP});
+  return {id,file:raw.file,agent:raw.agent,date:raw.date,utts:raw.utts,
+          words,dur:+(t+1.2).toFixed(1),deleted:false};
+}
+
+/* ---------- phrase library ---------- */
+const PHRASES=[];
+const STARTER=[
+ {id:1,text:"send the payment to a different account",concept:"payment-redirection",active:true,
+  alts:["redirect the payment to another account","change the bank account for the payout","move the money somewhere else","push it to a new routing number"],
+  tests:[["pos","could you send that payment to a different account instead",.72],
+         ["pos","we need to move the money somewhere else this month",.97],
+         ["neg","the payment posted to my account yesterday as expected",.38]]},
+ {id:2,text:"go buy gift cards and read me the numbers",concept:"gift-card-request",active:true,
+  alts:["purchase gift cards and send me the codes","pick up some gift cards and read the numbers on the back"],
+  tests:[["pos","he said go buy some gift cards and read me the numbers on the back",.73],
+         ["neg","I used a gift card I got for my birthday to pay part of the bill",.17]]},
+ {id:3,text:"tell me the one time passcode",concept:"credential-request",active:true,
+  alts:["read me the verification code you received","tell me the temporary password over the phone","share the security code so I can log in"],
+  tests:[["pos","can you just tell me the one time passcode you sent so I can log in",.97],
+         ["neg","I entered the passcode myself on the website and it worked fine",.21]]},
+ {id:4,text:"keep this between us and don't tell anyone",concept:"secrecy-pressure",active:true,
+  alts:["don't mention this to anyone else","keep it quiet and handle it yourself"],
+  tests:[["pos","he emailed me and said keep it quiet",.45],
+         ["neg","please tell your team about the outage so everyone is informed",.07]]},
+ {id:5,text:"this is urgent you need to do it right now",concept:"urgency-pressure",active:true,
+  alts:["it has to happen immediately no time to verify","make an exception this one time it cannot wait"],
+  tests:[["pos","it is urgent the vendor is waiting can you just make an exception this one time",.55],
+         ["neg","no rush at all whenever you get a chance next week is fine",.13]]}];
+
+/* ---------- scoring ---------- */
+let ANCHORS=[[0,0],[.40,35],[.55,60],[.70,85],[.85,96],[1,100]];
+let BANDS={high:80,medium:40};
+let MINSIM=.40;
+const score=s=>{for(let i=1;i<ANCHORS.length;i++){const[a,va]=ANCHORS[i-1],[b,vb]=ANCHORS[i];
+  if(s<=b)return Math.round(va+(vb-va)*(s-a)/(b-a))}return 100};
+const band=n=>n>=BANDS.high?"high":n>=BANDS.medium?"medium":"low";
+const why=f=>{const p=PHRASES.find(p=>p.id===f.pid);
+  return `Flagged for “${p.concept}”: the segment “${f.snip}” reads as a match `+
+  `for the target phrase “${p.text}” (similarity ${f.sim.toFixed(2)}`+
+  `${f.sim>=.97?" — near-exact wording":""}).`};
+
+/* ---------- assemble state ---------- */
+const CALLS=[];
+let FID=0;
+function makeFlag(ci,pid,snip,sim){
+  const call=CALLS[ci],toks=snip.toLowerCase().split(" ");
+  const lw=call.words.map(w=>w.w.toLowerCase().replace(/[^\w']/g,""));
+  let at=-1;
+  for(let i=0;i+toks.length<=lw.length;i++)
+    if(toks.every((t,j)=>lw[i+j]===t.replace(/[^\w']/g,""))){at=i;break}
+  if(at<0){console.warn("snippet not found",snip);return null}
+  const sc=score(sim);
+  return {id:++FID,call:ci,pid,snip,sim,sw:at,ew:at+toks.length,
+          t:call.words[at].s,score:sc,band:band(sc),status:"new",
+          note:null,by:null,when:null};
+}
+let FLAGS=[];
+
+const TEAM=[];
+let USER={name:"Guest",init:"GU"};
+let SIGNED=false;
+let PENDING=[];        /* uploaded recordings waiting for the next scan */
+let UPLOAD_N=0;
+const AUDIT=[];
+const logA=(action,what)=>{AUDIT.unshift({ts:new Date().toISOString()
+  .slice(0,19).replace("T"," "),who:USER.name,action,what});
+  if(AUDIT.length>200)AUDIT.pop();
+  schedulePersist()};
+
+/* ================================================================
+   PERSISTENCE — hosted workspace storage.
+   Single atomic snapshot under one key; every mutation funnels
+   through logA() → schedulePersist(). Falls back to in-memory
+   (session-only) when the storage API isn't available.
+   ================================================================ */
+const WSKEY="earmark-workspace-v1";
+const _mem=new Map();
+const HAS_WS=!!(typeof window!=="undefined"&&window.storage&&
+  typeof window.storage.get==="function");
+/* MODE: "ws" = hosted artifact storage · "api" = Earmark server ·
+         "mem" = session-only fallback */
+let MODE="mem";
+async function detectMode(){
+  if(HAS_WS){MODE="ws";return}
+  try{const r=await fetch("/api/healthz");
+      if(r.ok){MODE="api";return}}catch(e){}
+  MODE="mem"}
+async function stGet(k){
+  try{
+    if(MODE==="ws"){const r=await window.storage.get(k);return r?r.value:null}
+    if(MODE==="api"){const r=await fetch("/api/workspace");
+      if(r.status===404)return null;
+      if(!r.ok)throw new Error("GET "+r.status);
+      return await r.text()}
+    return _mem.get(k)??null}
+  catch(e){return null}}          /* missing key → treat as empty */
+/* one attempt; returns true | false | "toobig" */
+async function stSetOnce(k,v){
+  try{
+    if(MODE==="ws"){const r=await window.storage.set(k,v);return !!r}
+    if(MODE==="api"){const r=await fetch("/api/workspace",{method:"PUT",
+      headers:{"content-type":"application/json"},body:v});
+      if(r.status===413)return "toobig";
+      return r.ok}
+    _mem.set(k,v);return true}
+  catch(e){return false}}
+
+function snapshot(){
+  return JSON.stringify({v:1,
+    calls:CALLS,flags:FLAGS,phrases:PHRASES,team:TEAM,audit:AUDIT,
+    meta:{user:USER,signedIn:SIGNED,theme:THEME,bands:BANDS,minsim:MINSIM,
+      anchors:ANCHORS,scanSeq:SCAN_SEQ,uploadN:UPLOAD_N,pending:PENDING}})}
+/* ---------- resilient persister ----------
+   Transient storage failures (rate limits, internal errors) are normal;
+   writes are coalesced, retried with backoff, kept dirty until a save
+   truly lands, and surfaced to the user instead of dying in the console. */
+const PERSIST={dirty:false,busy:false,fails:0,lastToast:0,timer:null,
+  retries:4,baseDelay:300,sizeLimit:4_800_000};
+function schedulePersist(){PERSIST.dirty=true;clearTimeout(PERSIST.timer);
+  PERSIST.timer=setTimeout(flushPersist,600)}
+async function flushPersist(){
+  if(PERSIST.busy||!PERSIST.dirty)return;
+  PERSIST.busy=true;PERSIST.dirty=false;
+  const snap=snapshot();
+  if(snap.length>PERSIST.sizeLimit){
+    PERSIST.busy=false;PERSIST.dirty=true;
+    return _persistToast("Workspace is near the storage size limit — "+
+      "export your flags, then Reset workspace in Admin to keep saving")}
+  let saved=false,delay=PERSIST.baseDelay;
+  for(let a=0;a<PERSIST.retries&&!saved;a++){
+    const r=await stSetOnce(WSKEY,snap);
+    if(r==="toobig"){PERSIST.busy=false;PERSIST.dirty=true;
+      return _persistToast("The server rejected the snapshot as too large — "+
+        "export and reset the workspace to keep saving")}
+    saved=r===true;
+    if(!saved&&a<PERSIST.retries-1){
+      await new Promise(res=>setTimeout(res,delay));delay*=2}}
+  PERSIST.busy=false;
+  if(saved){
+    if(PERSIST.fails>0)toast("Workspace saved — connection recovered");
+    PERSIST.fails=0;
+    if(PERSIST.dirty)flushPersist();      /* changes arrived mid-save */
+  }else{
+    PERSIST.fails++;PERSIST.dirty=true;   /* keep the data, keep trying */
+    console.error("Earmark: persist failed after "+PERSIST.retries+" attempts");
+    _persistToast("Cloud save failed — your work is kept locally and "+
+      "saving will retry automatically");
+    setTimeout(()=>{if(PERSIST.dirty&&!PERSIST.busy)flushPersist()},15000);
+  }}
+function _persistToast(msg){const now=Date.now();
+  if(now-PERSIST.lastToast>45000){PERSIST.lastToast=now;toast(msg)}}
+/* best-effort flush when the tab closes (API mode: beacon POST alias) */
+window.addEventListener("beforeunload",()=>{
+  if(!PERSIST.dirty)return;
+  if(MODE==="api"&&navigator.sendBeacon)
+    navigator.sendBeacon("/api/workspace",
+      new Blob([snapshot()],{type:"application/json"}))});
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="hidden"&&PERSIST.dirty&&!PERSIST.busy)
+    flushPersist()});
+
+async function loadWorkspace(){
+  const raw=await stGet(WSKEY);
+  if(!raw)return false;
+  try{
+    const d=JSON.parse(raw);
+    CALLS.length=0;CALLS.push(...(d.calls||[]));
+    FLAGS=d.flags||[];
+    PHRASES.length=0;PHRASES.push(...(d.phrases||[]));
+    TEAM.length=0;TEAM.push(...(d.team||[]));
+    AUDIT.length=0;AUDIT.push(...(d.audit||[]));
+    const m=d.meta||{};
+    USER=m.user||USER;SIGNED=!!m.signedIn;THEME=m.theme||"aura";
+    BANDS=m.bands||BANDS;MINSIM=m.minsim??MINSIM;ANCHORS=m.anchors||ANCHORS;
+    SCAN_SEQ=m.scanSeq||0;UPLOAD_N=m.uploadN||0;PENDING=m.pending||[];
+    FID=FLAGS.reduce((a,f)=>Math.max(a,f.id),0);
+    return true;
+  }catch(e){console.error("Earmark: corrupt snapshot ignored",e);return false}}
+
+const S={view:"queue",band:null,status:null,concept:null,search:"",
+  sort:"score",dir:-1,sel:new Set(),
+  callId:null,activeFlag:null,previewOut:null,editId:null,draft:null,
+  auditAll:false};
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const tc=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
+const liveCalls=()=>CALLS.filter(c=>!c.deleted);
+function toast(html){const d=document.createElement("div");d.className="toast";
+  d.innerHTML=html;$("#toasts").append(d);setTimeout(()=>d.remove(),3400)}
+
+/* ---------- waveforms (the signature) ---------- */
+function waveSVG(call,flags,{w,h,cls,bars}){
+  const r=rng(call.id*77+13),n=bars,bw=w/n,out=[];
+  for(let i=0;i<n;i++){
+    const t0=i/n*call.dur,t1=(i+1)/n*call.dur;
+    const hit=flags.find(f=>{const fe=call.words[Math.min(f.ew-1,call.words.length-1)].e;
+      return f.t<t1&&fe>t0});
+    const amp=.25+.72*r()*(0.6+0.4*Math.sin(i*.7));
+    const bh=Math.max(2,amp*h);
+    out.push(`<rect data-i="${i}" x="${(i*bw+.5).toFixed(1)}" y="${((h-bh)/2).toFixed(1)}" width="${Math.max(1.4,bw-1.6).toFixed(1)}" height="${bh.toFixed(1)}" rx="1" class="${hit?"hit-"+hit.band:""}"/>`)}
+  return `<svg class="${cls}" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" preserveAspectRatio="none" aria-hidden="true">${out.join("")}</svg>`;
+}
+function gateWave(){const r=rng(4),el=$("#gatewave");let s="";
+  for(let i=0;i<72;i++){const bh=8+56*r();
+    const red=i>44&&i<52,blu=i>14&&i<22;
+    s+=`<rect x="${i*7.2}" y="${(72-bh)/2}" width="4.6" height="${bh}" rx="1" fill="${red?"var(--high)":blu?"var(--blue)":"#26304A"}"/>`}
+  el.innerHTML=s}
+
+/* ---------- router ---------- */
+function go(v,arg){S.view=v;if(v==="call")S.callId=arg;
+  if(v!=="queue")S.sel.clear();
+  stopPlayback();render();$("#view").focus({preventScroll:true});
+  window.scrollTo({top:0})}
+function render(){
+  document.querySelectorAll(".navbtn").forEach(b=>
+    b.classList.toggle("on",b.dataset.v===(S.view==="call"?"calls":S.view)));
+  const _newN=FLAGS.filter(f=>f.status==="new"&&!CALLS[f.call].deleted).length;
+  $("#qcount").textContent=_newN;
+  const bb=$("#bellcount");if(bb){bb.textContent=_newN;bb.hidden=_newN===0}
+  $("#u-init").textContent=USER.init;$("#u-name").textContent=USER.name;
+  $("#view").innerHTML=({queue:vQueue,calls:vCalls,call:vCall,
+    phrases:vPhrases,analytics:vAnalytics,admin:vAdmin})[S.view]();
+  if(S.view==="call")wireCall();
+  if(S.view==="admin")wireAdmin();
+}
+
+/* ================= QUEUE ================= */
+function flagRows(){
+  let rows=FLAGS.filter(f=>!CALLS[f.call].deleted);
+  if(S.band)rows=rows.filter(f=>f.band===S.band);
+  if(S.status)rows=rows.filter(f=>f.status===S.status);
+  if(S.concept)rows=rows.filter(f=>PHRASES.find(p=>p.id===f.pid).concept===S.concept);
+  if(S.search){const q=S.search.toLowerCase();
+    rows=rows.filter(f=>f.snip.toLowerCase().includes(q)||
+      PHRASES.find(p=>p.id===f.pid).concept.includes(q)||
+      CALLS[f.call].file.includes(q))}
+  const key={score:f=>f.score,time:f=>CALLS[f.call].date+String(f.t).padStart(7,"0"),
+             status:f=>f.status}[S.sort];
+  return rows.sort((a,b)=>{const x=key(a),y=key(b);
+    return (x<y?-1:x>y?1:0)*S.dir});
+}
+function chip(label,key,val,dot){const on=S[key]===val;
+  return `<button class="chip ${on?"on":""}" onclick="S.${key}=${on?"null":`'${val}'`};S.sel.clear();render()">${dot?`<span class="dot ${val}"></span>`:""}${label}</button>`}
+function sortTh(label,key){
+  const on=S.sort===key;
+  return `<th class="sortable" role="button" tabindex="0" aria-sort="${on?(S.dir<0?"descending":"ascending"):"none"}"
+    onclick="setSort('${key}')" onkeydown="if(event.key==='Enter')setSort('${key}')">${label}
+    <span class="arr">${on?(S.dir<0?"↓":"↑"):""}</span></th>`}
+window.setSort=k=>{if(S.sort===k)S.dir=-S.dir;else{S.sort=k;S.dir=-1}render()};
+function vQueue(){
+  const rows=flagRows();
+  const concepts=[...new Set(PHRASES.map(p=>p.concept))];
+  const allSel=rows.length&&rows.every(f=>S.sel.has(f.id));
+  const hr=new Date().getHours(),
+        part=hr<12?"morning":hr<18?"afternoon":"evening",
+        first=(USER.name||"there").split(" ")[0];
+  const dec=FLAGS.filter(f=>!CALLS[f.call].deleted&&
+    (f.status==="confirmed"||f.status==="dismissed"));
+  const conf=dec.filter(f=>f.status==="confirmed").length;
+  const qi=dec.length>=5?((100*conf/dec.length).toFixed(1)):null;
+  const newN=FLAGS.filter(f=>f.status==="new"&&!CALLS[f.call].deleted).length;
+  const liveN=liveCalls().length;
+  return `<div class="hello">
+    <h1 class="page">Good ${part}, <b>${esc(first)}</b>.</h1>
+    <p class="lede">Here's your overview of recent call activity.</p></div>
+  <div class="ovr">
+    <div class="panel pad ov">
+      <span class="kick2">Quality index</span>
+      <span class="big">${qi!==null?qi:"—"}</span>
+      <span class="sub">${qi!==null?
+        "reviewer-confirmed precision across decided flags":
+        "decide a few flags and this calibrates itself"}</span></div>
+    <div class="panel pad ov attn">
+      <span class="aicon">!</span>
+      <span class="big">${newN}</span>
+      <span class="sub">flagged moment${newN===1?"":"s"} awaiting human review</span>
+      ${newN?`<button class="btn" onclick="S.status='new';S.band=null;render()">Review now</button>`:""}</div>
+    <div class="panel pad ov">
+      <span class="kick2">Calls processed</span>
+      <span class="big">${liveN}</span>
+      <span class="sub">${PENDING.length?
+        `${PENDING.length} recording${PENDING.length===1?"":"s"} waiting for the next scan`:
+        liveN?"every recording scanned":"add recordings to begin"}</span></div>
+  </div>
+  <h2>Flagged moments</h2>
+  <div class="filters">
+    ${chip("High","band","high",1)}${chip("Medium","band","medium",1)}${chip("Low","band","low",1)}
+    <span style="width:.4rem"></span>
+    ${chip("New","status","new")}${chip("Confirmed","status","confirmed")}${chip("Dismissed","status","dismissed")}${chip("Escalated","status","escalated")}
+    <select class="speed" aria-label="Filter by concept" onchange="S.concept=this.value||null;S.sel.clear();render()">
+      <option value="">All concepts</option>
+      ${concepts.map(c=>`<option ${S.concept===c?"selected":""}>${c}</option>`).join("")}
+    </select>
+    <span style="flex:1"></span>
+    <span class="muted" style="font-size:.85rem">${rows.length} flag${rows.length!==1?"s":""}</span>
+    <button class="btn quiet" onclick="exportFlags()">Export view (JSON)</button>
+  </div>
+  ${S.sel.size?`<div class="bulkbar"><b>${S.sel.size}</b> selected
+    <button class="btn quiet" onclick="bulkDecide('dismissed')">Dismiss</button>
+    <button class="btn quiet" onclick="exportFlags(null,[...S.sel])">Export selected</button>
+    <button class="btn ghost" style="color:#EDE6DA" onclick="S.sel.clear();render()">Clear</button>
+  </div>`:""}
+  <div class="panel" style="overflow-x:auto">
+  ${rows.length?`<table class="q">
+    <tr><th class="ck"><input type="checkbox" class="box" ${allSel?"checked":""}
+      aria-label="Select all" onclick="toggleAll(this.checked)"></th>
+      ${sortTh("Confidence","score")}<th>Moment</th><th>What was said</th>
+      <th>Call</th>${sortTh("At","time")}${sortTh("Status","status")}</tr>
+    ${rows.map(f=>{const p=PHRASES.find(p=>p.id===f.pid),c=CALLS[f.call];
+      return `<tr class="row" onclick="if(event.target.type!=='checkbox'){go('call',${f.call});S.activeFlag=${f.id}}">
+      <td class="ck"><input type="checkbox" class="box" ${S.sel.has(f.id)?"checked":""}
+        aria-label="Select flag ${f.id}" onclick="toggleSel(${f.id},this.checked)"></td>
+      <td><span class="score ${f.band}">${f.score}<small>${f.band}</small></span></td>
+      <td>${waveSVG(c,[f],{w:92,h:22,cls:"wave",bars:30})}<br>
+          <span class="tag">${p.concept}</span></td>
+      <td class="snip">“…<mark>${esc(f.snip)}</mark>…”</td>
+      <td class="mono">${c.file.replace(".wav","")}<br>
+          <span class="muted">${c.agent} · ${tc(c.dur)}</span></td>
+      <td class="mono">${tc(f.t)}</td>
+      <td><span class="pill ${f.status}">${f.status}</span></td></tr>`}).join("")}
+  </table>`:`<div class="empty"><div class="big">Nothing matches</div>
+    ${S.search?`No flags mention “${esc(S.search)}”. `:""}${FLAGS.length===0?
+    (PHRASES.length===0?`Start by loading or adding phrases in the
+      <a href="#" onclick="go('phrases');return false">Phrases</a> tab, then
+      upload recordings in Admin and run a scan.`:
+     `Upload recordings in <a href="#" onclick="go('admin');return false">Admin</a>
+      and run a scan.`):
+    `Clear a filter chip above, or scan for new calls from Admin.`}</div>`}
+  </div>`;
+}
+window.toggleSel=(id,on)=>{on?S.sel.add(id):S.sel.delete(id);render()};
+window.toggleAll=on=>{S.sel=on?new Set(flagRows().map(f=>f.id)):new Set();render()};
+window.bulkDecide=st=>{
+  const n=S.sel.size;
+  S.sel.forEach(id=>{const f=FLAGS.find(f=>f.id===id);
+    f.status=st;f.by=USER.name;
+    f.when=new Date().toISOString().slice(0,16).replace("T"," ")});
+  logA("bulk_"+st,`${n} flag(s)`);S.sel.clear();
+  toast(`<b>${n}</b> flag(s) ${st}`);render()};
+
+/* ================= CALLS ================= */
+function vCalls(){
+  const cs=liveCalls();
+  return `<h1 class="page">Calls</h1>
+  <p class="lede">Everything ingested into this workspace. Duplicates are
+    detected by content, so re-uploads never double-count.</p>
+  <div class="panel" style="overflow-x:auto"><table class="q">
+  <tr><th>Recording</th><th></th><th>Agent</th><th>Date</th>
+      <th>Length</th><th>Flags</th><th>Top score</th></tr>
+  ${cs.map(c=>{const fl=FLAGS.filter(f=>f.call===c.id);
+    const top=fl.length?fl.reduce((a,b)=>a.score>b.score?a:b):null;
+    return `<tr class="row" onclick="go('call',${c.id})">
+    <td class="mono">${c.file}</td>
+    <td>${waveSVG(c,fl,{w:150,h:24,cls:"wave",bars:44})}</td>
+    <td>${c.agent}</td><td class="mono">${c.date}</td>
+    <td class="mono">${tc(c.dur)}</td>
+    <td class="mono">${fl.length||"—"}</td>
+    <td>${top?`<span class="score ${top.band}">${top.score}</span>`:'<span class="muted">clean</span>'}</td>
+    </tr>`}).join("")||`<tr><td colspan="7" class="empty">No calls yet — add
+      recordings from Admin.</td></tr>`}
+  </table></div>`;
+}
+
+/* ================= CALL WORKSPACE ================= */
+const P={timer:null,t:0,playing:false,rate:1};
+function stopPlayback(){clearInterval(P.timer);P.playing=false;P.t=0}
+function vCall(){
+  const c=CALLS[S.callId];
+  if(!c||c.deleted)return `<div class="panel empty pad">That call was deleted.
+    <a href="#" onclick="go('calls');return false">Back to calls</a></div>`;
+  const fl=FLAGS.filter(f=>f.call===c.id).sort((a,b)=>b.score-a.score);
+  const hit={};fl.slice().sort((a,b)=>a.score-b.score)
+    .forEach(f=>{for(let i=f.sw;i<f.ew;i++)hit[i]=f});
+  let wi=0;
+  const script=c.utts.map(([spk],ui)=>{
+    const ws=[];
+    while(wi<c.words.length&&c.words[wi].ui===ui){
+      const w=c.words[wi],f=hit[wi];
+      ws.push(`<span class="w ${f?`hit b-${f.band}`:""}" data-i="${wi}"
+        data-s="${w.s}" ${f?`data-f="${f.id}"`:""}>${esc(w.w)}</span>`);wi++}
+    return `<p class="utt ${spk}"><span class="spk">${spk==="agent"?
+      "Agent · "+c.agent:"Caller"}</span>${ws.join(" ")}</p>`}).join("");
+  return `<p style="margin:.1rem 0 .6rem"><a href="#" onclick="go('queue');return false">← Queue</a></p>
+  <h1 class="page" style="margin-bottom:.1rem">${c.file.replace(".wav","")}</h1>
+  <p class="lede">${c.agent} · ${c.date} · ${tc(c.dur)} ·
+    ${fl.length} flag${fl.length!==1?"s":""} ·
+    <a href="#" onclick="exportFlags(${c.id});return false">Export flags (JSON)</a> ·
+    <a href="#" style="color:var(--high)"
+       onclick="deleteCall(${c.id});return false">Delete call</a></p>
+  <div class="callgrid">
+    <div class="player">
+      <div class="panel console pad">
+        <div id="bigwavebox">${waveSVG(c,fl,{w:640,h:96,cls:"bigwave",bars:120})}</div>
+        <div class="pctl">
+          <button class="playbtn" id="playbtn" aria-label="Play or pause">
+            <svg id="ppicon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+          <span class="tc"><span id="tcur">0:00</span> / ${tc(c.dur)}</span>
+          <select class="speed" id="rate" aria-label="Playback speed">
+            <option>0.75</option><option selected>1</option>
+            <option>1.25</option><option>1.5</option><option>2</option></select>
+          <label class="muted" style="font-size:.83rem">
+            <input type="checkbox" id="follow" checked> Follow along</label>
+        </div>
+        <p class="muted" style="font-size:.8rem;margin:.7rem 0 0">
+          <span class="kbd">space</span> play/pause ·
+          <span class="kbd">←</span><span class="kbd">→</span> skip 3s ·
+          click any word or the waveform to jump. Demo playback is simulated —
+          no real audio in this workspace.</p>
+      </div>
+      <h2>Flags on this call</h2>
+      ${fl.map(f=>{const p=PHRASES.find(p=>p.id===f.pid);
+        return `<div class="flagcard ${f.band} ${S.activeFlag===f.id?"active":""}" id="fc${f.id}">
+        <div class="row2">
+          <span class="score ${f.band}">${f.score}<small>${f.band}</small></span>
+          <span class="tag">${p.concept}</span>
+          <span class="pill ${f.status}">${f.status}</span>
+          <a class="mono" style="margin-left:auto" href="#"
+             onclick="seek(${f.t});return false">▶ ${tc(f.t)}</a></div>
+        <div class="why">${esc(why(f))}</div>
+        ${f.by?`<div class="decided">${f.status} by ${f.by} · ${f.when}${f.note?` — “${esc(f.note)}”`:""}</div>`:""}
+        <div class="row2">
+          <input type="text" id="note${f.id}" placeholder="Add a note (optional)"
+                 value="${f.note?esc(f.note):""}">
+          <button class="sbtn confirm" onclick="decide(${f.id},'confirmed')">Confirm</button>
+          <button class="sbtn dismiss" onclick="decide(${f.id},'dismissed')">Dismiss</button>
+          <button class="sbtn escalate" onclick="decide(${f.id},'escalated')">Escalate</button>
+          ${f.status!=="new"?`<button class="sbtn" onclick="decide(${f.id},'new')">Reopen</button>`:""}
+        </div></div>`}).join("")||`<div class="panel empty">No flags — this call came back clean.</div>`}
+    </div>
+    <div class="panel">
+      <div class="pad" style="border-bottom:1px solid var(--line2);
+        display:flex;align-items:baseline;gap:.7rem">
+        <h2 style="margin:0">Transcript</h2>
+        <span class="muted" style="font-size:.8rem">click any word to jump
+          the audio — <span class="w hit" style="cursor:default">highlights</span>
+          are flagged regions</span></div>
+      <div class="script" id="script">${script}</div>
+    </div>
+  </div>`;
+}
+function wireCall(){
+  const c=CALLS[S.callId];if(!c||c.deleted)return;
+  const words=[...document.querySelectorAll("#script .w[data-s]")];
+  const bars=[...document.querySelectorAll(".bigwave rect")];
+  const btn=$("#playbtn"),icon=$("#ppicon"),cur=$("#tcur");
+  let lastWord=null;
+  function paint(){
+    cur.textContent=tc(P.t);
+    const frac=P.t/c.dur;
+    bars.forEach((b,i)=>b.classList.toggle("played",
+      i/bars.length<frac&&!b.getAttribute("class")?.includes("hit")));
+    let active=null;
+    for(const w of words){const s=+w.dataset.s;
+      if(P.t>=s-.02&&P.t<=s+WPS+.1){active=w;break}}
+    if(active!==lastWord){
+      lastWord?.classList.remove("now");
+      if(active){active.classList.add("now");
+        if($("#follow").checked)active.scrollIntoView?.({block:"center",
+          behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
+      lastWord=active}
+  }
+  function tick(){P.t+=.1*P.rate;
+    if(P.t>=c.dur){P.t=c.dur;pause()}paint()}
+  function play(){if(P.playing)return;P.playing=true;
+    icon.innerHTML='<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+    P.timer=setInterval(tick,100)}
+  function pause(){P.playing=false;clearInterval(P.timer);
+    icon.innerHTML='<path d="M7 4.5v15l13-7.5z"/>'}
+  window.seek=t=>{P.t=Math.max(0,Math.min(t,c.dur));paint();play()};
+  window._pp=()=>P.playing?pause():play();
+  window._skip=d=>{P.t=Math.max(0,Math.min(P.t+d,c.dur));paint()};
+  btn.onclick=()=>window._pp();
+  $("#rate").onchange=e=>P.rate=+e.target.value;
+  words.forEach(w=>w.onclick=()=>{
+    if(w.dataset.f){S.activeFlag=+w.dataset.f;
+      document.querySelectorAll(".flagcard").forEach(fc=>
+        fc.classList.toggle("active",fc.id==="fc"+w.dataset.f))}
+    window.seek(+w.dataset.s)});
+  const big=$("#bigwavebox svg");
+  big.onclick=e=>{const r=big.getBoundingClientRect();
+    window.seek((e.clientX-r.left)/r.width*c.dur)};
+  if(S.activeFlag){const f=FLAGS.find(f=>f.id===S.activeFlag);
+    if(f&&f.call===c.id){P.t=f.t;paint();
+      setTimeout(()=>$("#fc"+f.id)?.scrollIntoView?.({block:"nearest"}),50)}}
+  logA("view_call",c.file);
+}
+window.decide=(id,st)=>{
+  const f=FLAGS.find(f=>f.id===id);
+  f.status=st;f.note=$("#note"+id)?.value||f.note;
+  f.by=st==="new"?null:USER.name;
+  f.when=st==="new"?null:new Date().toISOString().slice(0,16).replace("T"," ");
+  logA("decide_"+st,`flag #${id} · ${f.snip.slice(0,32)}…`);
+  toast(st==="new"?"Flag reopened":`Flag <b>${st}</b>`);
+  render();
+};
+window.deleteCall=id=>{
+  const c=CALLS[id];
+  if(!confirm(`Delete ${c.file}, its transcript and all its flags? This cannot be undone.`))return;
+  c.deleted=true;
+  const n=FLAGS.filter(f=>f.call===id).length;
+  FLAGS=FLAGS.filter(f=>f.call!==id);
+  logA("delete_call",`${c.file} · ${n} flag(s) removed`);
+  toast(`Deleted <b>${c.file}</b> and ${n} flag(s)`);
+  go("calls")};
+window.exportFlags=(callId,ids)=>{
+  const src=callId!=null?FLAGS.filter(f=>f.call===callId):
+    ids?FLAGS.filter(f=>ids.includes(f.id)):flagRows();
+  const rows=src.map(f=>({id:f.id,call:CALLS[f.call].file,
+      concept:PHRASES.find(p=>p.id===f.pid).concept,
+      phrase:PHRASES.find(p=>p.id===f.pid).text,
+      score:f.score,band:f.band,similarity:f.sim,at_seconds:f.t,
+      snippet:f.snip,status:f.status,note:f.note,decided_by:f.by}));
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),
+    workspace:"Earmark",count:rows.length,flags:rows},null,2)],
+    {type:"application/json"});
+  const a=Object.assign(document.createElement("a"),
+    {href:URL.createObjectURL(blob),download:"earmark-flags.json"});
+  a.click();URL.revokeObjectURL(a.href);
+  logA("export",`${rows.length} flag(s) → JSON`);
+  toast(`Exported <b>${rows.length}</b> flag(s)`);
+};
+
+/* ================= PHRASES ================= */
+function tokenSim(a,b){const A=new Set(a.toLowerCase().split(/\s+/)),
+  B=new Set(b.toLowerCase().split(/\s+/));let inter=0;
+  A.forEach(t=>B.has(t)&&inter++);
+  return A.size&&B.size?inter/Math.sqrt(A.size*B.size):0}
+function bestSim(p,snippet){
+  return Math.max(...[p.text,...p.alts].map(v=>tokenSim(v,snippet)))}
+function vPhrases(){
+  const groups={};PHRASES.forEach(p=>(groups[p.concept]??=[]).push(p));
+  const editing=S.editId?PHRASES.find(p=>p.id===S.editId):null;
+  const dr=S.draft||{};
+  const val=(edit,drft)=>editing?esc(edit):drft?esc(drft):"";
+  return `<h1 class="page">Phrase library</h1>
+  <p class="lede">What Earmark listens for. Each phrase matches meaning, not
+    just exact words — alternate wordings widen the net, and test sentences
+    let every phrase prove it still works after a change.</p>
+  ${PHRASES.length===0?`<div class="panel pad" style="margin-bottom:1.2rem;
+    display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:16rem"><strong>Your library is empty.</strong>
+      <span class="muted">Add your first phrase below, or start from five
+      common business-call phrases and edit from there.</span></div>
+    <button class="btn" onclick="loadStarter()">Load starter library</button>
+  </div>`:""}
+  ${Object.entries(groups).map(([concept,ps])=>`
+  <div class="concept-group"><h3>${concept}</h3><div class="panel">
+    ${ps.map(p=>{const n30=FLAGS.filter(f=>f.pid===p.id).length;
+    return `<div class="phr">
+      <label class="switch"><input type="checkbox" ${p.active?"checked":""}
+        onchange="togglePhrase(${p.id},this.checked)"
+        aria-label="Active: ${esc(p.text)}"><i></i></label>
+      <div><div class="t">“${esc(p.text)}”
+        <button class="btn ghost edit" style="font-size:.8rem;padding:.1rem .4rem"
+          onclick="startEdit(${p.id})">Edit</button></div>
+        <div class="alts">${p.alts.length?"also: "+p.alts.map(a=>`“${esc(a)}”`).join(" · "):"no alternate wordings yet"}</div>
+        <div>${p.tests.map(([k,s,sim])=>{
+          const pass=k==="pos"?sim>=MINSIM:sim<MINSIM;
+          return `<span class="testchip ${pass?"pass":"fail"}"
+            title="${esc(s)} — ${k==="pos"?"should flag":"should stay quiet"} · similarity ${sim.toFixed(2)}">${pass?"✓":"✗"} ${k}</span>`}).join("")||
+          '<span class="muted" style="font-size:.78rem">no test sentences</span>'}
+        </div></div>
+      <div class="meta"><span class="n">${n30}</span>
+        <small>flags · 30d</small></div>
+    </div>`}).join("")}
+  </div></div>`).join("")}
+
+  <h2 id="phraseform">${editing?`Edit phrase`:"Add a phrase"}</h2>
+  <div class="panel pad"><div class="formgrid">
+    <label class="full">Phrase — the wording to listen for
+      <input id="np-text" value="${val(editing&&editing.text,dr.text)}"
+        placeholder="e.g. wire the funds to an overseas account"></label>
+    <label>Concept — a short grouping label
+      <input id="np-concept" value="${val(editing&&editing.concept,dr.concept)}"
+        placeholder="e.g. payment-redirection" list="cl">
+      <datalist id="cl">${[...new Set(PHRASES.map(p=>p.concept))]
+        .map(c=>`<option value="${c}">`).join("")}</datalist></label>
+    <label>Other ways people say it — one per line
+      <textarea id="np-alts" rows="3"
+        placeholder="route it offshore&#10;send it to a foreign bank">${val(editing&&editing.alts.join("\n"),dr.alts)}</textarea></label>
+    <label>Test sentences that SHOULD flag — one per line
+      <textarea id="np-pos" rows="2">${val(editing&&editing.tests.filter(t=>t[0]==="pos").map(t=>t[1]).join("\n"),dr.pos)}</textarea></label>
+    <label>Test sentences that should NOT flag — one per line
+      <textarea id="np-neg" rows="2">${val(editing&&editing.tests.filter(t=>t[0]==="neg").map(t=>t[1]).join("\n"),dr.neg)}</textarea></label>
+    <div class="full" style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
+      <button class="btn" onclick="savePhrase()">${editing?"Save changes":"Add phrase"}</button>
+      ${editing?`<button class="btn quiet" onclick="S.editId=null;S.draft=null;render()">Cancel</button>`:""}
+      <button class="btn quiet" onclick="previewPhrase()">Preview impact first</button>
+      <span class="muted" style="font-size:.85rem">Preview scores the draft
+        against stored transcripts — nothing is reprocessed.</span></div>
+  </div>
+  ${S.previewOut?`<div style="margin-top:1rem;border-top:1px solid var(--line2);padding-top:.9rem">
+    <strong>${S.previewOut.hits.length}</strong> likely flag(s) across
+    ${liveCalls().length} stored calls:
+    ${S.previewOut.hits.length?`<ul style="margin:.4rem 0 0">${S.previewOut.hits.map(h=>
+      `<li>${CALLS[h.call].file} — <span class="score ${h.band}" style="font-size:.85rem">${h.score}</span>
+       “${esc(h.snip)}”</li>`).join("")}</ul>`:
+      `<span class="muted"> none — consider adding alternate wordings.</span>`}
+  </div>`:""}
+  </div>`;
+}
+window.togglePhrase=(id,on)=>{const p=PHRASES.find(p=>p.id===id);p.active=on;
+  logA(on?"phrase_activate":"phrase_deactivate",p.text);
+  toast(`“${esc(p.text.slice(0,34))}…” ${on?"active":"deactivated"} —
+    existing flags and history are kept`)};
+window.startEdit=id=>{S.editId=id;S.previewOut=null;S.draft=null;render();
+  $("#phraseform").scrollIntoView?.({block:"start"})};
+window.previewPhrase=()=>{
+  const text=$("#np-text").value.trim();
+  if(!text)return toast("Type a phrase first");
+  const alts=$("#np-alts").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  S.draft={text,concept:$("#np-concept").value,alts:$("#np-alts").value,
+    pos:$("#np-pos").value,neg:$("#np-neg").value};
+  const draft={text,alts};
+  const hits=[];
+  liveCalls().forEach(c=>{const toks=c.words.map(w=>w.w);
+    for(let i=0;i<toks.length-4;i+=3){
+      const win=toks.slice(i,i+9).join(" ");
+      const sim=bestSim(draft,win);
+      if(sim>=Math.max(.5,MINSIM)){const sc=score(Math.min(.99,sim));
+        hits.push({call:c.id,snip:win,score:sc,band:band(sc)});i+=9}}});
+  S.previewOut={hits:hits.slice(0,6)};
+  logA("phrase_preview",text);render()};
+window.savePhrase=()=>{
+  const text=$("#np-text").value.trim(),
+        concept=$("#np-concept").value.trim()||"draft";
+  if(!text)return toast("Type a phrase first");
+  const alts=$("#np-alts").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  const mk=(kind,el)=>$(el).value.split("\n").map(s=>s.trim()).filter(Boolean)
+    .map(s=>[kind,s,+bestSim({text,alts},s).toFixed(2)]);
+  const tests=[...mk("pos","#np-pos"),...mk("neg","#np-neg")];
+  if(S.editId){
+    const p=PHRASES.find(p=>p.id===S.editId);
+    Object.assign(p,{text,concept,alts,tests});
+    logA("phrase_edit",`${text} (${concept})`);
+    toast(`Phrase updated — applies from the next scan`);
+    S.editId=null;
+  }else{
+    PHRASES.push({id:Math.max(...PHRASES.map(p=>p.id))+1,text,concept,
+      active:true,alts,tests});
+    logA("phrase_add",`${text} (${concept})`);
+    toast(`Phrase added — it applies from the next scan`);
+  }
+  S.previewOut=null;S.draft=null;render()};
+
+/* ================= ANALYTICS ================= */
+function vAnalytics(){
+  const live=FLAGS.filter(f=>!CALLS[f.call].deleted);
+  const decided=live.filter(f=>f.status==="confirmed"||f.status==="dismissed");
+  const prec=b=>{const d=decided.filter(f=>f.band===b);
+    if(!d.length)return null;
+    return d.filter(f=>f.status==="confirmed").length/d.length};
+  const newFlags=live.filter(f=>f.status==="new");
+  const concepts={};live.forEach(f=>{
+    const c=PHRASES.find(p=>p.id===f.pid).concept;
+    concepts[c]=(concepts[c]||0)+1});
+  const maxC=Math.max(1,...Object.values(concepts));
+  const by={};live.filter(f=>f.by).forEach(f=>{
+    (by[f.by]??={n:0,last:""});by[f.by].n++;
+    if(f.when>by[f.by].last)by[f.by].last=f.when});
+  const oldest=newFlags.length?newFlags.map(f=>CALLS[f.call].date).sort()[0]:null;
+  const days=[],today=new Date();
+  for(let i=13;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    days.push({key:key.slice(5),
+      n:live.filter(f=>CALLS[f.call].date===key).length})}
+  const maxD=Math.max(1,...days.map(d=>d.n));
+  const pts=days.map((d,i)=>`${(i/(days.length-1)*560).toFixed(1)},${(120-d.n/maxD*104).toFixed(1)}`);
+  const bandRow=b=>{const p=prec(b),imp={high:.9,medium:.6,low:.25}[b];
+    return `<tr><td><span class="score ${b}" style="font-size:.85rem">${b}</span></td>
+    <td class="mono">${decided.filter(f=>f.band===b).length}</td>
+    <td class="mono">${p===null?"—":Math.round(p*100)+"%"}</td>
+    <td class="mono">${p===null?"—":(p-imp>=0?"+":"")+Math.round((p-imp)*100)+"%"}</td></tr>`};
+  return `<h1 class="page">Analytics</h1>
+  <p class="lede">Is the score trustworthy, is the queue healthy, and where is
+    the volume coming from — updated live as your team reviews.</p>
+  <div class="statrow">
+    <div class="panel stat"><div class="n">${live.length}</div><small>total flags</small></div>
+    <div class="panel stat"><div class="n">${newFlags.length}</div><small>waiting for review</small></div>
+    <div class="panel stat"><div class="n">${decided.length}</div><small>decisions made</small></div>
+    <div class="panel stat"><div class="n">${live.filter(f=>f.status==="escalated").length}</div><small>escalated</small></div>
+  </div>
+  <div class="chart2">
+    <div class="panel pad"><h2 style="margin-top:0">Flags per day</h2>
+      ${live.length===0?`<p class="muted" style="font-size:.88rem">No flags
+        yet — this chart fills in as scans find matches.</p>`:`
+      <svg viewBox="0 0 560 132" width="100%" aria-label="Flags per day, last 14 days">
+        <polyline points="${pts.join(" ")}" fill="none"
+          stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round"/>
+        <polygon points="0,120 ${pts.join(" ")} 560,120"
+          fill="var(--blue-soft)" opacity=".7"/>
+        ${days.map((d,i)=>i%2?"":`<text x="${i/(days.length-1)*560}" y="131"
+          font-size="9" fill="var(--mut)" text-anchor="middle"
+          font-family="var(--mono)">${d.key}</text>`).join("")}
+      </svg>`}</div>
+    <div class="panel pad"><h2 style="margin-top:0">Score calibration
+      <span class="muted" style="font-weight:400;font-size:.8rem">— does an
+      80 behave like an 80?</span></h2>
+      <table class="prec"><tr><th>Band</th><th>Decided</th>
+        <th>Confirm rate</th><th>Drift</th></tr>
+        ${bandRow("high")}${bandRow("medium")}${bandRow("low")}
+      </table>
+      <p class="muted" style="font-size:.84rem">Confirm/dismiss decisions feed
+        recalibration — run it from Admin when drift grows.
+        ${decided.length<8?"Decide a few more flags to make this meaningful.":""}</p>
+    </div>
+  </div>
+  <div class="chart2" style="margin-top:1rem">
+    <div class="panel pad">
+      <h2 style="margin-top:0">Volume by concept</h2>
+      ${Object.entries(concepts).sort((a,b)=>b[1]-a[1]).map(([c,n])=>
+      `<div class="hbar"><span class="lab">${c}</span>
+        <span class="trk"><i style="width:${n/maxC*100}%"></i></span>
+        <span class="val">${n}</span></div>`).join("")||'<p class="muted">No flags yet.</p>'}
+    </div>
+    <div class="panel pad">
+      <h2 style="margin-top:0">Reviewer throughput</h2>
+      <table class="prec"><tr><th>Reviewer</th><th>Decisions</th><th>Last</th></tr>
+      ${Object.entries(by).sort((a,b)=>b[1].n-a[1].n).map(([who,d])=>
+        `<tr><td>${who}</td><td class="mono">${d.n}</td>
+         <td class="mono">${d.last}</td></tr>`).join("")||
+        `<tr><td colspan="3" class="muted">No decisions yet.</td></tr>`}
+      </table>
+      <h2>Backlog</h2>
+      <p><strong>${newFlags.length}</strong> undecided flag(s)${oldest?
+        ` · oldest is from a call on <span class="mono">${oldest}</span>`:""}</p>
+    </div>
+  </div>`;
+}
+
+/* ================= ADMIN ================= */
+function vAdmin(){
+  const dec=FLAGS.filter(f=>f.status==="confirmed"||f.status==="dismissed").length;
+  const rows=S.auditAll?AUDIT:AUDIT.slice(0,14);
+  return `<h1 class="page">Admin</h1>
+  <p class="lede">Bring calls in, run scans, and tune how sensitive Earmark
+    is — every change here is logged below.</p>
+  <div class="steps">
+  <div class="stepcard"><div>
+    <h2 style="margin:.15rem 0 .5rem">Add call recordings</h2>
+    <div class="panel pad">
+      <div class="drop" id="drop">
+        <strong>Drop audio files here</strong> or
+        <label style="color:var(--blue-deep);cursor:pointer;text-decoration:underline">
+          browse<input type="file" multiple hidden id="fpick"></label>
+        <div class="muted" style="font-size:.83rem;margin-top:.3rem">
+          wav · mp3 · m4a · flac — or connect your telephony provider
+          (RingCentral, Twilio, Genesys…) for automatic nightly ingest</div>
+      </div>
+      ${PENDING.length?`<div class="pendbox">⏳
+        <span><b>${PENDING.length}</b> recording(s) received and waiting for
+        the next scan: <span class="mono">${PENDING.map(p=>esc(p)).join(", ")}</span></span></div>`:""}
+    </div>
+  </div></div>
+  <div class="stepcard"><div>
+    <h2 style="margin:.15rem 0 .5rem">Scan for flagged language</h2>
+    <div class="panel pad" style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+      <button class="btn" id="scanbtn" onclick="runScan()">Scan for new calls
+        ${PENDING.length?`(${PENDING.length} waiting)`:""}</button>
+      <span class="muted" style="font-size:.88rem">${liveCalls().length} call(s) in
+        the workspace · ${PHRASES.filter(p=>p.active).length} active phrase(s) ·
+        prototype mode: uploads run through a simulated transcription pipeline
+        until the production backend is connected.</span>
+    </div>
+  </div></div>
+  <div class="stepcard"><div>
+    <h2 style="margin:.15rem 0 .5rem">Tune sensitivity</h2>
+    <div class="panel pad">
+      <div class="formgrid">
+        <label>High band starts at
+          <span class="range"><input type="range" min="50" max="99"
+            value="${BANDS.high}" id="rg-h"
+            oninput="$('#o-h').value=this.value">
+          <output id="o-h">${BANDS.high}</output></span></label>
+        <label>Medium band starts at
+          <span class="range"><input type="range" min="10" max="79"
+            value="${BANDS.medium}" id="rg-m"
+            oninput="$('#o-m').value=this.value">
+          <output id="o-m">${BANDS.medium}</output></span></label>
+        <label>Minimum match strength — below this, nothing is flagged
+          <span class="range"><input type="range" min="20" max="80"
+            value="${Math.round(MINSIM*100)}" id="rg-s"
+            oninput="$('#o-s').value=(this.value/100).toFixed(2)">
+          <output id="o-s">${MINSIM.toFixed(2)}</output></span></label>
+      </div>
+      <div style="display:flex;gap:.8rem;align-items:center;margin-top:.9rem;flex-wrap:wrap">
+        <button class="btn" onclick="saveSettings()">Save settings</button>
+        <button class="btn quiet" onclick="recal()" ${dec<4?"disabled":""}
+          title="${dec<4?"Needs at least 4 confirm/dismiss decisions":""}">
+          Recalibrate scores from ${dec} decision(s)</button>
+        <span class="muted" style="font-size:.85rem">Recalibration refits the
+          0–100 scale so “80” means ≈80% of similar flags get confirmed.</span>
+      </div>
+    </div>
+  </div></div>
+  </div>
+  <h2>Team</h2>
+  <div class="panel" style="overflow-x:auto"><table class="q">
+    <tr><th>Member</th><th>Role</th><th>Decisions</th><th>Access</th></tr>
+    ${TEAM.map(m=>`<tr><td>${esc(m.name)}</td><td>${m.role}</td>
+      <td class="mono">${FLAGS.filter(f=>f.by===m.name).length||"—"}</td>
+      <td>${m.access}</td></tr>`).join("")}
+  </table>
+  <div class="inviterow">
+    <label class="fieldcol" style="flex:1;min-width:11rem;display:flex;
+      flex-direction:column;gap:.25rem;font-size:.72rem;text-transform:uppercase;
+      letter-spacing:.08em;color:var(--mut)">Invite by email
+      <input id="inv-email" placeholder="colleague@acme.com" style="border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem;font:inherit;text-transform:none;letter-spacing:0"></label>
+    <label class="fieldcol" style="display:flex;flex-direction:column;gap:.25rem;
+      font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)">Role
+      <select id="inv-role" style="border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem;font:inherit;text-transform:none;letter-spacing:0">
+        <option>Reviewing manager</option><option>Program admin</option>
+        <option>Audit (read-only)</option></select></label>
+    <button class="btn" onclick="invite()">Send invite</button>
+  </div></div>
+  <h2>Activity log</h2>
+  <div class="panel" style="overflow-x:auto"><table class="audit" style="width:100%;border-collapse:collapse">
+    <tr><th>When</th><th>Who</th><th>Action</th><th>Detail</th></tr>
+    ${rows.map(a=>`<tr><td class="mono">${a.ts}</td>
+      <td>${esc(a.who)}</td><td class="mono">${a.action}</td>
+      <td class="muted">${esc(a.what||"")}</td></tr>`).join("")||
+      `<tr><td colspan="4" class="muted" style="padding:1rem">Actions you take
+        in this demo will appear here.</td></tr>`}
+  </table>
+  ${AUDIT.length>14?`<div style="padding:.6rem .9rem">
+    <button class="btn ghost" onclick="S.auditAll=!S.auditAll;render()">
+      ${S.auditAll?"Show recent only":`Show all ${AUDIT.length} entries`}</button></div>`:""}
+  </div>
+  <p class="muted" style="font-size:.83rem">Every view, play, decision, export
+    and settings change is recorded — the audit trail your compliance team
+    will ask for.</p>
+  <h2>Danger zone</h2>
+  <div class="panel pad" style="display:flex;gap:1rem;align-items:center;
+    flex-wrap:wrap">
+    <div style="flex:1;min-width:16rem"><strong>Reset workspace.</strong>
+      <span class="muted">Erases every call, flag, phrase, invite and log
+      entry from persistent storage. Your sign-in is kept.</span></div>
+    <button class="btn danger" onclick="resetWorkspace()">Erase all data</button>
+  </div>`;
+}
+function wireAdmin(){
+  const drop=$("#drop");if(!drop)return;
+  ["dragover","dragenter"].forEach(e=>drop.addEventListener(e,ev=>{
+    ev.preventDefault();drop.classList.add("over")}));
+  ["dragleave","drop"].forEach(e=>drop.addEventListener(e,ev=>{
+    ev.preventDefault();drop.classList.remove("over")}));
+  drop.addEventListener("drop",ev=>receiveFiles(ev.dataTransfer.files));
+  $("#fpick").addEventListener("change",ev=>receiveFiles(ev.target.files));
+}
+window.receiveFiles=files=>{
+  const names=[...files].map(f=>f.name||`recording_${++UPLOAD_N}.wav`);
+  if(!names.length)names.push(`recording_${++UPLOAD_N}.wav`);
+  PENDING.push(...names);
+  logA("upload",names.join(", "));
+  toast(`<b>${names.length}</b> file(s) received — run a scan to process`);
+  render()};
+window.invite=()=>{
+  const email=$("#inv-email").value.trim();
+  if(!email||!email.includes("@"))return toast("Enter a work email first");
+  const name=email.split("@")[0].split(/[._-]/)
+    .map(s=>s[0]?s[0].toUpperCase()+s.slice(1):"").join(" ").trim()||email;
+  TEAM.push({name:name+" (invited)",role:$("#inv-role").value,
+    access:"Pending acceptance"});
+  logA("invite",`${email} · ${$("#inv-role").value}`);
+  toast(`Invite sent to <b>${esc(email)}</b>`);render()};
+window.saveSettings=()=>{
+  BANDS={high:+$("#rg-h").value,medium:+$("#rg-m").value};
+  if(BANDS.medium>=BANDS.high)BANDS.medium=BANDS.high-1;
+  MINSIM=+$("#rg-s").value/100;
+  FLAGS.forEach(f=>f.band=band(f.score));
+  logA("settings_change",
+    `bands high≥${BANDS.high} · medium≥${BANDS.medium} · min match ${MINSIM.toFixed(2)}`);
+  toast("Settings saved — every score chip just re-tinted");render()};
+window.recal=()=>{
+  const dec=FLAGS.filter(f=>f.status==="confirmed"||f.status==="dismissed");
+  if(dec.length<4)return toast("Decide a few flags first — recalibration learns from Confirm / Dismiss");
+  job("Recalibrating from reviewer decisions…",1600,()=>{
+    const rate=dec.filter(f=>f.status==="confirmed").length/dec.length;
+    ANCHORS=ANCHORS.map(([s,v])=>[s,Math.min(100,Math.round(v*(0.85+0.3*rate)))]);
+    FLAGS.forEach(f=>{if(f.status==="new"){f.score=score(f.sim);
+      f.band=band(f.score)}});
+    logA("calibrate",`${dec.length} decisions used`);
+    toast(`Recalibrated from <b>${dec.length}</b> decisions — undecided flags rescored`);
+    render()})};
+let SCAN_SEQ=0;
+window.runScan=()=>{
+  const todo=PENDING.length;
+  if(todo&&!PHRASES.some(p=>p.active))
+    return toast("Add phrases first (Phrases tab) — a scan can't flag anything without a library");
+  if(!todo){
+    job("Scanning… checking for new recordings",1400,()=>{
+      logA("scan","0 new calls");
+      toast("Scan complete — no new recordings since last scan");render()});
+    return}
+  job(`Scanning… transcribing ${todo} new call(s)`,2200,()=>{
+    let flagsAdded=0;
+    PENDING.forEach(name=>{
+      const tpl=SYNTH[SCAN_SEQ++%SYNTH.length];
+      const file=name.replace(/\.(mp3|m4a|flac|ogg)$/i,".wav")
+        .replace(/[^A-Za-z0-9._-]/g,"_");
+      const c=buildCall({file,agent:tpl.agent,date:"2026-07-02",
+        utts:tpl.utts},CALLS.length);
+      CALLS.push(c);
+      tpl.flags.forEach(([pid,snip,sim])=>{
+        if(sim>=MINSIM&&PHRASES.find(p=>p.id===pid)?.active){
+          const f=makeFlag(c.id,pid,snip,sim);
+          if(f){FLAGS.push(f);flagsAdded++}}});
+    });
+    logA("scan",`${todo} call(s) · ${flagsAdded} flag(s)`);
+    PENDING=[];
+    toast(`Scan complete — <b>${todo}</b> new call(s), <b>${flagsAdded}</b> new flag(s) in the queue`);
+    render()})};
+function job(msg,ms,done){$("#jobmsg").textContent=msg;
+  $("#jobpill").classList.add("on");
+  setTimeout(()=>{$("#jobpill").classList.remove("on");done()},ms)}
+
+/* ---------- auth + boot (session restore) ---------- */
+async function enter(){
+  await READY;
+  const email=($("#si-email")?.value||"").trim();
+  if(email&&email.includes("@")){
+    const name=email.split("@")[0].split(/[._-]/)
+      .map(s=>s[0]?s[0].toUpperCase()+s.slice(1):"").join(" ").trim();
+    if(name)USER={name,init:name.split(" ").map(s=>s[0]).join("")
+      .slice(0,2).toUpperCase()};}
+  if(!TEAM.some(m=>m.name===USER.name))
+    TEAM.unshift({name:USER.name,role:"Reviewing manager",
+      access:"Queue · Calls · Export"});
+  SIGNED=true;
+  $("#signin").style.display="none";
+  $("#app").classList.add("on");logA("sign_in",email||"guest session");
+  render()}
+window.signOut=()=>{SIGNED=false;logA("sign_out","");stopPlayback();
+  $("#app").classList.remove("on");$("#signin").style.display="grid";
+  const e=$("#si-email");if(e)e.value=""};
+
+/* boot: load persisted workspace; restore live sessions straight in */
+const READY=(async()=>{
+  await detectMode();
+  const had=await loadWorkspace();
+  applyTheme();
+  if(had&&SIGNED){
+    $("#signin").style.display="none";
+    $("#app").classList.add("on");render()}
+  return had})();
+
+/* ---------- boot + keyboard ---------- */
+/* ---------- starter library + workspace reset ---------- */
+window.loadStarter=()=>{
+  if(PHRASES.length)return toast("Library already has phrases");
+  STARTER.forEach(p=>PHRASES.push(JSON.parse(JSON.stringify(p))));
+  logA("phrase_starter","loaded 5 starter phrases");
+  toast("Starter library loaded — <b>5</b> phrases");render()};
+window.resetWorkspace=async()=>{
+  if(!confirm("Erase every call, flag, phrase, team member and log entry in this workspace? This cannot be undone."))return;
+  CALLS.length=0;FLAGS=[];PHRASES.length=0;PENDING=[];AUDIT.length=0;
+  TEAM.length=0;TEAM.push({name:USER.name,role:"Reviewing manager",
+    access:"Queue · Calls · Export"});
+  SCAN_SEQ=0;UPLOAD_N=0;FID=0;
+  BANDS={high:80,medium:40};MINSIM=.40;
+  ANCHORS=[[0,0],[.40,35],[.55,60],[.70,85],[.85,96],[1,100]];
+  logA("workspace_reset","all workspace data erased");
+  toast("Workspace erased — fresh start");render()};
+
+/* ---------- theme ---------- */
+let THEME="aura";
+const SUN='<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>';
+const MOON='<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",THEME);
+  const dark=THEME==="noir";
+  const ic=document.getElementById("themeicon"),
+        lb=document.getElementById("themelbl");
+  if(ic)ic.innerHTML=dark?SUN:MOON;
+  if(lb)lb.textContent=dark?"Noir":"Aura";
+}
+window.toggleTheme=()=>{THEME=THEME==="aura"?"noir":"aura";
+  applyTheme();logA("theme_change",THEME);
+  toast(`Theme: <b>${THEME==="noir"?"Noir":"Aura"}</b>`)};
+applyTheme();
+gateWave();
+document.addEventListener("keydown",e=>{
+  const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||"");
+  if(typing)return;
+  if(e.key==="Escape"&&S.view==="call")go("queue");
+  if(S.view==="call"&&window._pp){
+    if(e.key===" "){e.preventDefault();window._pp()}
+    if(e.key==="ArrowRight")window._skip(3);
+    if(e.key==="ArrowLeft")window._skip(-3);
+  }});
+
+</script>
+</body>
+</html>

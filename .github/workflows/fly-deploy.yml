@@ -1,0 +1,78 @@
+name: Test & Deploy to Fly.io
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "earmark-iac/**"
+      - "README.md"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fly-deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Backend + persistence tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Backend contract tests (15 checks)
+        run: |
+          pip install -r requirements.txt httpx
+          python tests/test_server.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: UI - API end-to-end (live uvicorn + jsdom)
+        run: |
+          npm install --no-save jsdom
+          DATA_DIR=/tmp/e2e python -m uvicorn server.main:app --host 127.0.0.1 --port 8123 &
+          sleep 2
+          node tests/qa.server.test.js
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Bootstrap app + volume (idempotent)
+        run: |
+          set -euo pipefail
+          APP=$(sed -n 's/^app *= *"\(.*\)"/\1/p' fly.toml)
+          REGION=$(sed -n 's/^primary_region *= *"\(.*\)"/\1/p' fly.toml)
+          echo "app=$APP region=$REGION"
+          if ! flyctl status --app "$APP" >/dev/null 2>&1; then
+            echo "creating app $APP"
+            flyctl apps create "$APP" ${FLY_ORG:+--org "$FLY_ORG"}
+          fi
+          if ! flyctl volumes list --app "$APP" --json | jq -e \
+               '.[] | select(.name=="earmark_data")' >/dev/null; then
+            echo "creating volume earmark_data in $REGION"
+            flyctl volumes create earmark_data --app "$APP" \
+              --region "$REGION" --size 1 --yes
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_ORG: ${{ vars.FLY_ORG }}
+
+      - name: fly deploy
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Post-deploy smoke test (12 checks)
+        if: vars.FLY_APP_URL != ''
+        run: ./scripts/smoke.sh "${{ vars.FLY_APP_URL }}"

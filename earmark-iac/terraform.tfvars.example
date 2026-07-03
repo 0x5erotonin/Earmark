@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars and edit.
+app_name       = "earmark-yourname"          # must be globally unique
+org            = "personal"
+primary_region = "iad"
+image          = "registry.fly.io/earmark-yourname:v1"
+# custom_domain = "earmark.example.com"

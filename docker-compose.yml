@@ -1,0 +1,10 @@
+# Local development / self-hosting without Fly.
+services:
+  earmark:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - earmark_data:/data
+volumes:
+  earmark_data:

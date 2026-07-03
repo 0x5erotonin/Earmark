@@ -1,0 +1,6 @@
+state/
+terraform.tfvars
+*.tfstate*
+.terraform/
+README.md
+Makefile
